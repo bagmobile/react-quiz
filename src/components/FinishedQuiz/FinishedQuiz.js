@@ -1,6 +1,8 @@
 import React from "react";
 import classes from "./FinishedQuiz.module.css"
 import Button from "../UI/Button/Button";
+import {Link} from "react-router-dom";
+
 
 const FinishQuiz = props => {
     const rightCount = Object.values(props.results).reduce((acc, value) => {
@@ -21,7 +23,7 @@ const FinishQuiz = props => {
         </ul>
         <p>Right {rightCount} from {props.quiz.length}</p>
         <Button onClick={props.onResetGame} type={`primary`}>Play again</Button>
-        <Button onClick={()=>{}} type={`success`}>Go to list of tests</Button>
+        <Link to={`/`}><Button type={`success`}>Go to list of tests</Button></Link>
     </div>
 )};
 

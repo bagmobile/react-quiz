@@ -2,6 +2,8 @@ import React, {Component} from "react";
 import classes from "./Quiz.module.css"
 import ActiveQuiz from "../../components/ActiveQuiz/ActiveQuiz";
 import FinishQuiz from "../../components/FinishedQuiz/FinishedQuiz";
+import axios from "../../axios/axios-quiz";
+import Loader from "../../components/UI/Loader/Loader";
 
 class Quiz extends Component {
 
@@ -12,55 +14,21 @@ class Quiz extends Component {
             activeQuestion: 0,
             isFinished: false,
             results: {},
-            quiz: [
-                {
-                    id: 1,
-                    question: `What color is sky?`,
-                    rightAnswerId: 4,
-                    answers: [
-                        {
-                            id: 1,
-                            text: `Black`
-                        },
-                        {
-                            id: 2,
-                            text: `Green`
-                        },
-                        {
-                            id: 3,
-                            text: `Red`
-                        },
-                        {
-                            id: 4,
-                            text: `Blue`
-                        }
-                    ]
-                },
-                {
-                    id: 2,
-                    question: `Was year Sankt-Peterburg based?`,
-                    rightAnswerId: 3,
-                    answers: [
-                        {
-                            id: 1,
-                            text: `1778`
-                        },
-                        {
-                            id: 2,
-                            text: `1700`
-                        },
-                        {
-                            id: 3,
-                            text: `1703`
-                        },
-                        {
-                            id: 4,
-                            text: `1802`
-                        }
-                    ]
-                }
-            ]
+            quiz: [],
+            loading: true
         };
+    }
+
+    async componentDidMount() {
+        try {
+            const response = await axios.get(`/quizes/${this.props.match.params.id}.json`);
+            this.setState({
+                quiz: response.data,
+                loading: false
+            });
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     onResetGameHandler = () => {
@@ -111,21 +79,24 @@ class Quiz extends Component {
             <div className={classes.Quiz}>
                 <div className={classes.QuizWrapper}>
                     <h1>Please answer all questions</h1>
-                    {this.state.isFinished
-                        ? <FinishQuiz
-                            quiz={this.state.quiz}
-                            results={this.state.results}
-                            onResetGame={this.onResetGameHandler}
-                        />
-                        : <ActiveQuiz
-                            question={this.state.quiz[this.state.activeQuestion].question}
-                            answers={this.state.quiz[this.state.activeQuestion].answers}
-                            onAnswerClick={this.onAnswerClickHandler}
-                            quizLength={this.state.quiz.length}
-                            answerNumber={this.state.activeQuestion + 1}
-                            answerState={this.state.answerState}
-                        />
+                    {this.state.loading
+                        ? <Loader/>
+                        : this.state.isFinished
+                            ? <FinishQuiz
+                                quiz={this.state.quiz}
+                                results={this.state.results}
+                                onResetGame={this.onResetGameHandler}
+                            />
+                            : <ActiveQuiz
+                                question={this.state.quiz[this.state.activeQuestion].question}
+                                answers={this.state.quiz[this.state.activeQuestion].answers}
+                                onAnswerClick={this.onAnswerClickHandler}
+                                quizLength={this.state.quiz.length}
+                                answerNumber={this.state.activeQuestion + 1}
+                                answerState={this.state.answerState}
+                            />
                     }
+
 
                 </div>
             </div>

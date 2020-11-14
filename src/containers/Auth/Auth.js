@@ -3,7 +3,8 @@ import classes from './Auth.module.css';
 import Button from "../../components/UI/Button/Button";
 import Input from "../../components/UI/Input/Input";
 import is from "is_js"
-import axios from "axios"
+import {connect} from "react-redux";
+import {auth} from "../../store/actions/auth";
 
 class Auth extends Component {
 
@@ -41,30 +42,20 @@ class Auth extends Component {
         }
     }
 
-    handleSignInClick = async () => {
-        const authData = {
-            email:  this.state.formControls.email.value,
-            password: this.state.formControls.password.value,
-            returnSecureToken: true
-        }
-        try{
-            const response = await axios.post(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDMAYQrcO2Ps2LM2f8zUQBFYUch_zrII0g`, authData);
-        }catch (e) {
-            console.log(e)
-        }
+    handleSignInClick = () => {
+        this.props.auth(
+            this.state.formControls.email.value,
+            this.state.formControls.password.value,
+            true
+        );
     }
 
-    handleSignUpClick = async () => {
-        const authData = {
-            email:  this.state.formControls.email.value,
-            password: this.state.formControls.password.value,
-            returnSecureToken: true
-        }
-        try{
-           const response = await axios.post(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDMAYQrcO2Ps2LM2f8zUQBFYUch_zrII0g`, authData);
-        }catch (e) {
-            console.log(e)
-        }
+    handleSignUpClick = () => {
+        this.props.auth(
+            this.state.formControls.email.value,
+            this.state.formControls.password.value,
+            false
+        );
     }
 
     handleFormSubmit = evt => {
@@ -117,7 +108,7 @@ class Auth extends Component {
                     const item = this.state.formControls[controlName]
                     return (<Input
                         key={index}
-                        type={item.type}
+                        inputType={item.type}
                         label={item.label}
                         errorMessage={item.errorMessage}
                         valid={item.valid}
@@ -156,4 +147,10 @@ class Auth extends Component {
     }
 }
 
-export default Auth;
+const mapDispatchToProps = dispatch => {
+    return {
+        auth: (email, password, isLogin) => dispatch(auth(email, password, isLogin))
+    }
+}
+
+export default connect(null, mapDispatchToProps)(Auth);
